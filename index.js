@@ -68,10 +68,13 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   socket.on('offer-error', (msg) => {
     console.error('offer-error:', msg)
   })
+  function _sign (offer) {
+    return sign(pemPrivateKey, offer)
+  }
   function encodeOffer (pubKey, offer) {
     let data = {from: publicKey, to: pubKey}
     data.offer = encrypt(privateKey, pubKey, offer)
-    data.signature = sign(pemPrivateKey, data.offer)
+    data.signature = _sign(data.offer)
     return data
   }
   var queue = []
@@ -88,6 +91,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     queue.forEach(arr => send(...arr))
     queue = []
   })
+  send.sign = _sign
 
   return send
 }

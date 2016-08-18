@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node run.js",
-    "test": "node tests.js"
+    "test": "node test.js"
   },
   "keywords": [],
   "author": "Mikeal Rogers <mikeal.rogers@gmail.com> (http://www.mikealrogers.com)",
