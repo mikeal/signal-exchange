@@ -4,8 +4,8 @@ const io = require('socket.io-client')
 
 function sign (pemPrivateKey, value) {
   if (typeof value !== 'string') value = JSON.stringify(value)
-  var algo = 'ecdsa-with-SHA1'
-  var _sign = crypto.createSign(algo)
+  let algo = 'ecdsa-with-SHA1'
+  let _sign = crypto.createSign(algo)
   _sign.update(value)
   return _sign.sign(pemPrivateKey).toString('hex')
 }
@@ -29,10 +29,8 @@ function encrypt (fromPrivateKey, toPublicKey, data) {
   if (typeof data !== 'string') data = JSON.stringify(data)
   // TODO: finish encryption
   let secret = computeSecret(fromPrivateKey, toPublicKey)
-
-  let cipher = crypto.createCipher('aes192', secret);
-
-  var encrypted = cipher.update(data, 'utf8', 'hex')
+  let cipher = crypto.createCipher('aes192', secret)
+  let encrypted = cipher.update(data, 'utf8', 'hex')
   encrypted += cipher.final('hex')
   return encrypted
 }
@@ -65,7 +63,6 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   socket.on('signal', data => {
     // TODO: wrap in try/catch
     data.offer = decrypt(privateKey, data.from, data.offer)
-    delete data.signature // This is the unencrypted signature
     onOffer(data)
   })
   socket.on('offer-error', (msg) => {
