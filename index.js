@@ -88,6 +88,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
 
   socket.once('ready', () => {
     socket._isReady = true
+    if (send.onReady) send.onReady()
     queue.forEach(arr => send(...arr))
     queue = []
   })

@@ -55,11 +55,9 @@ test('basic signal exchange', t => {
     send2(signal.from, {type: 'answer'})
   })
 
-  // This makes it work in w/ upgrades
-  // TODO: fix in core core
-  send2.socket.on('ready', () => {
+  send2.onReady = () => {
     send1(user2.pub, {type: 'offer'})
-  })
+  }
 })
 
 test('teardown', t => {
