@@ -51,7 +51,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     onOffer = publicKey
     publicKey = privateKey
     privateKey = host
-    host = 'https://signalexchange.now.sh' // TODO: default host on zeit
+    host = 'https://signalexchange.now.sh'
   }
 
   var socket = io(host)
