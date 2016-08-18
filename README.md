@@ -29,7 +29,7 @@ let send1 = signalExchange(user1.priv, user1.pub, signal => {
   peer1.signal(signal.offer)
 })
 let send2 = signalExchange(user2.priv, user2.pub, signal => {
-  var peer2 = new SimplePeer()
+  var peer2 = new SimplePeer({trickle:false}))
   peer2.once('signal', offer => {
     send2(signal.from, signal.offer)
   })
