@@ -43,6 +43,8 @@ peer1.once('signal', offer => {
 
 ## `signalExchange([url], privateKey, publicKey, onOffer)`
 
+Returns a `send` function.
+
 * **url** *(optional)* The url of the peer exchange. Defaults to
   `wss://signalexchange.now.sh` a public exchange hosted on zeit.
 * **privateKey** *(required)* hex encoded private key.
@@ -55,3 +57,8 @@ peer1.once('signal', offer => {
   * **to** hex encoded public key.
   * **from** hex encoded public key.
   * **offer** decrypted offer object, can be passed directly to SimplePeer.
+
+## `send(publicKey, offer)`
+
+* **publicKey** *(required)* hex encoded public key.
+* **offer** *(required)* offer object from SimplePeer.
