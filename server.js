@@ -7,6 +7,7 @@ module.exports = function (io) {
         return console.error('signature failure, not subscribed.')
       } else {
         socket.join(publicKey)
+        socket.emit('ready')
       }
     })
     socket.on('signal', data => {

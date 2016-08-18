@@ -8,10 +8,10 @@ const signalExchange = require('./')
 const serverDestroy = require('server-destroy')
 
 const cors = corsify({
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-    'Access-Control-Allow-Headers': 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization'
-  })
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+  'Access-Control-Allow-Headers': 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Authorization'
+})
 
 const handler = cors((req, res) => {
   if (req.url === '/') {
@@ -43,17 +43,23 @@ test('basic signal exchange', t => {
   t.plan(2)
   let user1 = generate()
   let user2 = generate()
-  let server = 'http://localhost:6688'
+  let server = 'ws://localhost:6688'
   let send1 = signalExchange(server, user1.priv, user1.pub, signal => {
     t.equal(signal.offer.type, 'answer')
     send1.socket.destroy()
     send2.socket.destroy()
   })
+
   let send2 = signalExchange(server, user2.priv, user2.pub, signal => {
     t.equal(signal.offer.type, 'offer')
     send2(signal.from, {type: 'answer'})
   })
-  send1(user2.pub, {type: 'offer'})
+
+  // This makes it work in w/ upgrades
+  // TODO: fix in core core
+  send2.socket.on('ready', () => {
+    send1(user2.pub, {type: 'offer'})
+  })
 })
 
 test('teardown', t => {

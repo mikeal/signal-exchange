@@ -51,7 +51,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     onOffer = publicKey
     publicKey = privateKey
     privateKey = host
-    host = '' // TODO: default host on zeit
+    host = 'https://signalexchange.now.sh' // TODO: default host on zeit
   }
 
   var socket = io(host)
@@ -77,12 +77,21 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     data.signature = sign(pemPrivateKey, data.offer)
     return data
   }
+  var queue = []
   function send (pubKey, offer) {
+    if (!socket._isReady) return queue.push([pubKey, offer])
     let data = encodeOffer(pubKey, offer)
     socket.emit('signal', data)
   }
   send.encodeOffer = encodeOffer
   send.socket = socket
+
+  socket.once('ready', () => {
+    socket._isReady = true
+    queue.forEach(arr => send(...arr))
+    queue = []
+  })
+
   return send
 }
 
