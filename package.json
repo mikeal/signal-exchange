@@ -1,0 +1,24 @@
+{
+  "name": "signal-exchange",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node run.js",
+    "test": "node tests.js"
+  },
+  "keywords": [],
+  "author": "Mikeal Rogers <mikeal.rogers@gmail.com> (http://www.mikealrogers.com)",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "asn1.js": "^4.8.0",
+    "corsify": "^2.1.0",
+    "socket.io": "^1.4.8",
+    "socket.io-client": "^1.4.8",
+    "socket.io-redis": "^1.0.0"
+  },
+  "devDependencies": {
+    "server-destroy": "^1.0.1",
+    "tape": "^4.6.0"
+  }
+}
