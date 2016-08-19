@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const ec_pem = require('./ec-pem')
 const io = require('socket.io-client')
+const rand = () => crypto.randomBytes(30).toString('hex')
 
 function sign (pemPrivateKey, value) {
   if (typeof value !== 'string') value = JSON.stringify(value)
@@ -60,9 +61,13 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   var data = {verify: true, nonce: crypto.randomBytes(30).toString('hex')}
   socket.emit('subscribe', publicKey, data, sign(pemPrivateKey, data))
 
+  function _decrypt (publicKey, obj) {
+    return decrypt(privateKey, publicKey, obj)
+  }
+
   socket.on('signal', data => {
     // TODO: wrap in try/catch
-    data.offer = decrypt(privateKey, data.from, data.offer)
+    data.offer = _decrypt(data.from, data.offer)
     onOffer(data)
   })
   socket.on('offer-error', (msg) => {
@@ -72,7 +77,12 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     return sign(pemPrivateKey, offer)
   }
   function encodeOffer (pubKey, offer) {
-    let data = {from: publicKey, to: pubKey}
+    let data = { from: publicKey,
+                 to: pubKey,
+                 nonce: rand(),
+                 created: Date.now(),
+                 expires: Date.now() + (30 * 1000)
+               }
     data.offer = encrypt(privateKey, pubKey, offer)
     data.signature = _sign(data.offer)
     return data
@@ -93,6 +103,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
     queue = []
   })
   send.sign = _sign
+  send.decrypt = _decrypt
 
   return send
 }
