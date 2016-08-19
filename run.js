@@ -23,4 +23,4 @@ const io = socketio(app)
 
 signalServer(io)
 
-app.listen(6688, () => console.log('listening 8080'))
+app.listen(6688, () => console.log('listening 6688'))
