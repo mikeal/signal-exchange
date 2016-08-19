@@ -1,6 +1,6 @@
 {
   "name": "signal-exchange",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "WebRTC signal exchange by public key.",
   "main": "index.js",
   "scripts": {
