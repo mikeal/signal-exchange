@@ -58,8 +58,33 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   var pem = ec_pem({private_key: new Buffer(privateKey, 'hex'), curve: c}, c)
   var pemPrivateKey = pem.encodePrivateKey()
 
-  var data = {verify: true, nonce: crypto.randomBytes(30).toString('hex')}
+  var data = {verify: true, nonce: crypto.randomBytes(30).toString('hex') }
   socket.emit('subscribe', publicKey, data, sign(pemPrivateKey, data))
+
+  function ping (to, onPong) {
+    let value = { nonce: crypto.randomBytes(30).toString('hex') }
+    let payload = {
+      signature: sign(pemPrivateKey, value),
+      from: publicKey,
+      to: to,
+      value
+    }
+    socket.emit('ping-req', payload)
+    socket.on('pong-res', _from => {
+      onPong(_from)
+    })
+  }
+
+  socket.on('ping-res', _from => {
+    let value = { nonce: crypto.randomBytes(30).toString('hex') }
+    let payload = {
+      signature: sign(pemPrivateKey, value),
+      from: publicKey,
+      to: _from,
+      value
+    }
+    socket.emit('pong-req', payload)
+  })
 
   function _decrypt (publicKey, obj) {
     return decrypt(privateKey, publicKey, obj)
@@ -104,7 +129,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   })
   send.sign = _sign
   send.decrypt = _decrypt
-
+  send.ping = ping
   return send
 }
 
