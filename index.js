@@ -130,6 +130,7 @@ function signalExchange (host, privateKey, publicKey, onOffer) {
   send.sign = _sign
   send.decrypt = _decrypt
   send.ping = ping
+  send.verify = verify
   send.encrypt = (pubKey, data) => encrypt(privateKey, pubKey, data)
   return send
 }
