@@ -1,7 +1,7 @@
 const test = require('tape')
 const http = require('http')
 const corsify = require('corsify')
-const crypto = require('crypto')
+const sodi = require('sodi')
 const socketio = require('socket.io')
 const signalServer = require('./server')
 const signalExchange = require('./')
@@ -24,14 +24,6 @@ const handler = cors((req, res) => {
 const app = http.createServer(handler)
 const io = socketio(app)
 
-function generate () {
-  let key = crypto.createECDH('secp521r1')
-  key.generateKeys()
-  let pub = key.getPublicKey().toString('hex')
-  let priv = key.getPrivateKey().toString('hex')
-  return {pub, priv}
-}
-
 test('setup server', t => {
   t.plan(1)
   signalServer(io)
@@ -41,22 +33,23 @@ test('setup server', t => {
 
 test('basic signal exchange', t => {
   t.plan(2)
-  let user1 = generate()
-  let user2 = generate()
+  let user1 = sodi.generate()
+  let user2 = sodi.generate()
   let server = 'ws://localhost:6688'
-  let send1 = signalExchange(server, user1.priv, user1.pub, signal => {
+
+  let send1 = signalExchange(server, user1, signal => {
     t.equal(signal.offer.type, 'answer')
     send1.socket.destroy()
     send2.socket.destroy()
   })
 
-  let send2 = signalExchange(server, user2.priv, user2.pub, signal => {
+  let send2 = signalExchange(server, user2, signal => {
     t.equal(signal.offer.type, 'offer')
     send2(signal.from, {type: 'answer'})
   })
 
   send2.onReady = () => {
-    send1(user2.pub, {type: 'offer'})
+    send1(user2.publicKey, {type: 'offer'})
   }
 })
 

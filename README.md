@@ -13,22 +13,16 @@ offer messages through the exchange.
 ```javascript
 const SimplePeer = require('simple-peer')
 const signalExchange = require('signal-exchange')
+const sodi = require('sodi')
 
-function generateKeys () {
-  let key = crypto.createECDH('secp521r1')
-  key.generateKeys()
-  let pub = key.getPublicKey().toString('hex')
-  let priv = key.getPrivateKey().toString('hex')
-  return {pub, priv}
-}
+// Generate keypairs w/ sodi.
+let user1 = sodi.generate()
+let user2 = sodi.generate()
 
-let user1 = generateKeys()
-let user2 = generateKeys()
-
-let send1 = signalExchange(user1.priv, user1.pub, signal => {
+let send1 = signalExchange(user1, signal => {
   peer1.signal(signal.offer)
 })
-let send2 = signalExchange(user2.priv, user2.pub, signal => {
+let send2 = signalExchange(user2, signal => {
   var peer2 = new SimplePeer({trickle:false}))
   peer2.once('signal', offer => {
     send2(signal.from, signal.offer)
@@ -37,7 +31,7 @@ let send2 = signalExchange(user2.priv, user2.pub, signal => {
 
 let peer1 = new SimplePeer({initiator:true, trickle:false})
 peer1.once('signal', offer => {
-  send1(user2.pub, offer) // Send offer to peer2 through exchange
+  send1(user2.publicKey, offer) // Send offer to peer2 through exchange
 })
 ```
 
