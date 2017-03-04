@@ -1,10 +1,14 @@
 const sodi = require('sodi')
 
 const toHex = o => Buffer.isBuffer(o) ? o.toString('hex') : o
+const fromHex = o => Buffer.isBuffer(o) ? o : new Buffer(o, 'hex')
 
 module.exports = function (io) {
   io.on('connection', socket => {
     socket.on('subscribe', (publicKey, data, signature) => {
+      if (!Buffer.isBuffer(signature) && typeof signature === 'string') {
+        signature = new Buffer(signature, 'hex')
+      }
       if (!data || !sodi.verify(data, signature, publicKey)) {
         return console.error('signature failure, not subscribed.')
       } else {
@@ -20,7 +24,10 @@ module.exports = function (io) {
         socket.emit('offer-error', 'send did not contain necessary info.')
         return console.error(msg)
       }
-      if (!sodi.verify(data.offer, data.signature, data.from)) {
+      let _from = fromHex(data.from)
+      let _offer = fromHex(data.offer)
+      let _signature = fromHex(data.signature)
+      if (!sodi.verify(_offer, _signature, _from)) {
         let msg = 'signature check failed.'
         socket.emit('offer-error', msg)
         return console.error(msg)

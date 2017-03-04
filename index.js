@@ -1,5 +1,7 @@
 const io = require('socket.io-client')
 const sodi = require('sodi')
+const toHex = o => !(typeof o === 'string') ? o.toString('hex') : o
+const fromHex = o => !(typeof o === 'string') ? o : new Buffer(o, 'hex')
 
 function signalExchange (host, keypair, onOffer) {
   if (!onOffer) {
@@ -39,7 +41,8 @@ function signalExchange (host, keypair, onOffer) {
 
   socket.on('signal', data => {
     // TODO: wrap in try/catch
-    let decrypted = _sodi.decrypt(data.offer, data.nonce, data.from)
+    let _offer = fromHex(data.offer)
+    let decrypted = _sodi.decrypt(_offer, data.nonce, data.from)
     data.offer = JSON.parse(decrypted.toString())
     onOffer(data)
   })
@@ -60,10 +63,13 @@ function signalExchange (host, keypair, onOffer) {
     data.signature = _sodi.sign(data.offer)
     return data
   }
-  var queue = []
+  let queue = []
   let send = (pubKey, offer) => {
     if (!socket._isReady) return queue.push([pubKey, offer])
     let data = encodeOffer(pubKey, offer)
+    data.from = toHex(data.from)
+    data.offer = toHex(data.offer)
+    data.signature = toHex(data.signature)
     socket.emit('signal', data)
   }
   send.encodeOffer = encodeOffer
@@ -78,8 +84,9 @@ function signalExchange (host, keypair, onOffer) {
   send.sodi = _sodi
   send.ping = ping
 
-  var data = Math.random().toString()
-  socket.emit('subscribe', _sodi.public, data, _sodi.sign(data))
+  let data = Math.random().toString()
+  let signed = toHex(_sodi.sign(data))
+  socket.emit('subscribe', _sodi.public, data, signed)
 
   return send
 }
