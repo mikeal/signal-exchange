@@ -41,7 +41,10 @@ module.exports = function (io) {
         socket.emit('ping-error', 'send did not contain necessary info.')
         return console.error(msg)
       }
-      if (!sodi.verify(data.value, data.signature, data.from)) {
+      let _from = fromHex(data.from)
+      let _value = data.value
+      let _signature = fromHex(data.signature)
+      if (!sodi.verify(_value, _signature, _from)) {
         let msg = 'signature check failed.'
         socket.emit('offer-error', msg)
         return console.error(msg)
@@ -58,7 +61,10 @@ module.exports = function (io) {
         socket.emit('pong-error', 'send did not contain necessary info.')
         return console.error(msg)
       }
-      if (!sodi.verify(data.value, data.signature, data.from)) {
+      let _from = fromHex(data.from)
+      let _value = data.value
+      let _signature = fromHex(data.signature)
+      if (!sodi.verify(_value, _signature, _from)) {
         let msg = 'signature check failed.'
         socket.emit('offer-error', msg)
         return console.error(msg)

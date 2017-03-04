@@ -10,14 +10,13 @@ function signalExchange (host, keypair, onOffer) {
     keypair = host
     host = 'wss://signalexchange-2.now.sh'
   }
-
   let _sodi = sodi(keypair)
   const socket = io(host)
 
   let ping = (to, onPong) => {
     let value = Math.random().toString()
     let payload = {
-      signature: _sodi.sign(value),
+      signature: _sodi.sign(value).toString('hex'),
       from: _sodi.public,
       to: to,
       value
@@ -31,7 +30,7 @@ function signalExchange (host, keypair, onOffer) {
   socket.on('ping-res', _from => {
     let value = Math.random().toString()
     let payload = {
-      signature: _sodi.sign(value),
+      signature: _sodi.sign(value).toString('hex'),
       from: _sodi.public,
       to: _from,
       value
