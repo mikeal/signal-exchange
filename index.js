@@ -8,7 +8,7 @@ function signalExchange (host, keypair, onOffer) {
     // Host is optional
     onOffer = keypair
     keypair = host
-    host = 'https://signalexchange-1.now.sh'
+    host = 'wss://signalexchange-2.now.sh'
   }
 
   let _sodi = sodi(keypair)
