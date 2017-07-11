@@ -1,5 +1,7 @@
 # Signal Exchange
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mikeal/signal-exchange.svg)](https://greenkeeper.io/)
+
 WebRTC signal exchange by public key.
 
 ```
